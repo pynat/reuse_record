@@ -1,6 +1,6 @@
 import json
 
-# Calculate Fläche Window
+# Calculate Area  Window
 def calculate_window_area(cell):
     frame_area = (cell["frame"]["width"] * cell["frame"]["hight"]) - (cell["frame"]["profile"]["width"] * cell["frame"]["profile"]["depth"])
     glass_area = cell["glas"]["width"] * cell["glas"]["hight"]
