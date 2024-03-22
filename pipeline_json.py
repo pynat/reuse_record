@@ -4,9 +4,22 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-df = pd.read_json("Data.json")
+data = pd.read_json("Data.json")
 
-selected_columns = ['Size Horizontal [m]', 'Size Vertical [m]', 'Frame Depth [cm]']
+#Rename in pythonic Style
+def rename_keys(d):
+    new_dict = {}
+    for key, value in d.items():
+        if isinstance(value, dict):
+            value = rename_keys(value)
+        new_key = key.replace(" ", "_").lower() 
+        new_dict[new_key] = value
+    return new_dict
+
+data = rename_keys(data)
+df = pd.DataFrame(data)
+
+selected_columns = ['size_horizontal_[m]', 'size_vertical_[m]', 'frame_depth_[cm]']
 df_selected = df[selected_columns]
 
 scaler = StandardScaler()
@@ -26,11 +39,18 @@ plt.xlabel('Anzahl der Cluster')
 plt.ylabel('WCSS')  # Within-Cluster-Sum-of-Squares
 plt.show()
 
-# Number of  Cluster
-num_clusters = 3
+# Define Number of  Cluster
+optimal_num_clusters = None
+max_dif = -1
+
+for i in range(1, len(wcss)):
+    dif = wcss[i-1] - wcss[i]
+    if dif > max_dif:
+        max_dif = dif
+        optimal_num_clusters = i + 1
 
 # K-Means Clustering
-kmeans = KMeans(n_clusters=num_clusters, init='k-means++', max_iter=300, n_init=10, random_state=0)
+kmeans = KMeans(n_clusters=optimal_num_clusters, init='k-means++', max_iter=300, n_init=10, random_state=0)
 df_selected['Cluster'] = kmeans.fit_predict(df_scaled)
 
 # Cluster-Statistik
